@@ -10,9 +10,7 @@ import random
 # 1. solve poisson equation, get hartree potential (veff)
     # - create node
 
-n_node_of_x = 10
-n_node_of_y = 10
-n_node_of_z = 10
+n_node_of_x = n_node_of_y = n_node_of_z = 3
 
 nodes = np.zeros((n_node_of_x, n_node_of_y, n_node_of_z))
 
@@ -27,8 +25,9 @@ def generate_basis(nx, ny, nz): # flattened 3d array
     return np.zeros((nx - 1) * (ny - 1) * (nz - 1))
 
 
-# nx = ny = nz = 10; dx = dy = dz = 1
-def unit_laplace_operator(nx, ny, nz, dx, dy, dz): 
+# # only  5 diagonal component is non-zero for 2d
+# nx = ny = nz = 3; dx = dy = dz = 1
+def generate_unit_laplace_operator(nx, ny, nz, dx = 1, dy = 1, dz = 1): 
     mat = np.zeros(((nx - 1) * (ny - 1) * (nz - 1), (nx - 1) * (ny - 1) * (nz - 1)))
 
     # fill diagonal term
@@ -58,19 +57,11 @@ def unit_laplace_operator(nx, ny, nz, dx, dy, dz):
     mat[rng , rng + nx + ny - 1] = 1 / dz ** 2
     return mat
 
+laplace_op = generate_unit_laplace_operator(nx, ny, nz)
 
-# # only  5 diagonal component is non-zero for 2d
-# def laplace_operator(u_matrix, dx, dy, dz):
-#     result = np.zeros_like(u_matrix)
 
-#     for i in range(1, n_node_of_x - 1):
-#         for j in range(1, n_node_of_y - 1):
-#             for k in range(1, n_node_of_z - 1):
-#                 f_x = (result[i + 1, j, k] + result[i - 1, j, k] - 2 * result[i, j, k]) / dx ** 2
-#                 f_y = (result[i, j + 1, k] + result[i, j - 1, k] - 2 * result[i, j, k]) / dy ** 2
-#                 f_z = (result[i, j, k + 1] + result[i, j, k - 1] - 2 * result[i, j, k]) / dz ** 2
-#                 result[i, j, k] = f_x + f_y + f_z
-#     return result
+
+
 
 # 2. from the veff, we can get full potential
 # 3. then calculate the coefficient of electron density functions.
