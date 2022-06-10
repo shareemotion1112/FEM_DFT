@@ -1,6 +1,6 @@
 # number of atoms : 2
 # material : hydrogen
-# space configuration : finite difference method
+# space configuration : finite difference method (유한차분법)
 
 # import packages
 import numpy as np
@@ -47,7 +47,7 @@ def generate_unit_laplace_operator(nx, ny, nz, dx = 1, dy = 1, dz = 1):
     mat[rng , rng + nx + 1] = 1 / dy ** 2
     mat[rng , rng + nx - 1] = 1 / dy ** 2
     
-    # fill off-diagonal term ~ y
+    # fill off-diagonal term ~ z
     rng = np.arange(mat.shape[0] - 1 - nx - ny)
     mat[rng + nx + ny, rng] = - 4 / dz ** 2
     mat[rng + nx + ny, rng + 1] = 1 / dz ** 2
