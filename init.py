@@ -7,6 +7,38 @@ import numpy as np
 import random
 
 
+
+
+# n(~x) = ∑|ψi(~x)|^2          (2.9) , (occ에 대해 sum)
+
+# G-space
+
+i_max = k_max = G_max = 10
+
+r = 0.1
+
+C = np.random.random((i_max, k_max, G_max))
+
+Psi = [[None for k in range(k_max)]for i in range(i_max)]
+
+# r 함수형
+for i in range(i_max):
+    for k in range(k_max):
+        def func(r, i = i, k = k):
+            global C
+            tmp = []
+            for G in range(G_max):                
+                print(C[i][k][G])
+                tmp.append(C[i][k][G] * np.exp(complex(0, (k + G) * r)))
+            return tmp
+        Psi[i][k] = func
+
+
+
+
+
+
+
 # 1. solve poisson equation, get hartree potential (veff)
     # - create node
 
@@ -65,6 +97,9 @@ laplace_op = generate_unit_laplace_operator(nx, ny, nz)
 
 # 2. from the veff, we can get full potential
 # 3. then calculate the coefficient of electron density functions.
+
+
+
 
 
 
