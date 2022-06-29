@@ -145,10 +145,6 @@ def generate_plane_wave_basis_nik(r = None):
             Psi[i][k] = tmp
     return Psi
 
-a = f"{C[i][k][g]} * {C[i][k][g_p]} * np.exp(complex(0, { k_m[k][0] + G_m[g][0] } * {r[0]} ) - complex(0, { k_m[k][0] + G_m[g_p][0] } * {r[0]} ) \
-        + complex(0, { k_m[k][1] + G_m[g][1] } * {r[1]} ) - complex(0, { k_m[k][1] + G_m[g_p][1] } * {r[1]} ) \
-        + complex(0, { k_m[k][2] + G_m[g][1] } * {r[2]} ) - complex(0, { k_m[k][2] + G_m[g_p][2] } * {r[2]} ) ) "
-eval(a)
 
 nik = generate_plane_wave_basis_nik()
 
@@ -156,11 +152,19 @@ nik = generate_plane_wave_basis_nik()
 # n(r) = 1/N_k * sum_(k, i)(n_ik)
 ###################################
 
-"""
-    test nik
-"""
-r = [0.5, 0.4, 0.2]
-eval(nik[0][0])
+def cal_Nr(r, nik):    
+    tmp = 0
+    for i in range(i_max):
+        for k in range(k_max):
+            tmp += eval(nik[i][k])
+    result = 1 / k_max * tmp
+    return result
+
+nr = cal_Nr([0.5, 0.2, 0.7], nik)
+
+
+
+
 
 
 
