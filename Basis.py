@@ -54,6 +54,7 @@ def generate_plane_wave_basis(config, r = None):
 
 
 # 1차원 수식
+#   phi_i의 i인덱스는 trial function의 index Psi = sum ( Psi_0 + Psi_1 + ... Psi_N) 에서 N, i_max(occupied number)로 봐도 되는가? 
 #   K = integral_(0, 1) * dphi_i / dx * dphi_j/ dx * dx
 #   K = integral_(0, 1) grad(phi_i) * grad(phi_j) * dr_vec
 #   K = integral_x(0, 1)integral_y(0, 1)integral_z(0, 1) * {dphi_i / dx * x_hat  + dphi_i / dy * y_hat + dphi_i / dz * z_hat} * {dphi_j / dx * x_hat  + dphi_j / dy  * y_hat + dphi_j / dz * z_hat} * d(x_hat + y_hat + z_hat)
