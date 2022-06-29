@@ -45,8 +45,8 @@ def generate_plane_wave_basis(config, r = None):
             def func(r, i = i, k = k, C = C):
                 tmp = []
                 for g in range(G_max):                
-                    # print(C[i][k][g])
-                    tmp.append(C[i][k][g] * np.exp(complex(0, (np.array(k_m[k]) + np.array(G_m[g])) * np.array(r))))
+                    # print({C[i][k][g]})
+                    tmp.append({C[i][k][g]} * np.exp(complex(0, (np.array({k_m[k]}) + np.array({G_m[g]})) * np.array(r))))
                 return tmp
             Psi[i][k] = func
 
@@ -67,17 +67,25 @@ def get_K_matrix(config, r=None):
     G_m = config['G_m']
     C = config['C']
     
-    K = [[None for k in range(k_max)] for i in range(i_max)]
+    K = [[None for k in range(k_max)] for i in range(k_max)]
 
-    for i in range(i_max):
-        for k in range(k_max):
-            def func(r, i = i, k = k, C = C):
-                tmp = []
-                for g in range(G_max):                
-                    # print(C[i][k][g])
-                    tmp.append(  complex(0, np.sum(np.array(k_m[k]) + np.array(G_m[g]))) * C[i][k][g] * np.exp(  complex( 0, np.inner( (np.array(k_m[k]) + np.array(G_m[g])), np.array(r) ) )  )   )
+    for k in range(k_max):
+        for k_p in range(k_max):
+            # print(k_m[k_p])
+            def func(r, k = k, k_p = k_p, C = C):
+                tmp = None
+                for i in range(i_max):
+                    for g in range(G_max):                
+                        # print(C[i][k][g])
+                        if tmp == None:
+                            # 미분해서 i(kx + ky + kz)가 앞에 곱해짐..
+                            tmp = complex(0, np.sum(np.array(k_m[k]) + np.array(G_m[g]))) * C[i][k][g] * np.exp(  complex( 0, np.inner( (np.array(k_m[k]) + np.array(G_m[g])), np.array(r) ) )  )  * \
+                            complex(0, np.sum(np.array(k_m[k_p]) + np.array(G_m[g]))) * C[i][k_p][g] * np.exp(  complex( 0, np.inner( (np.array(k_m[k_p]) + np.array(G_m[g])), np.array(r) ) )  )                        
+                        else:
+                            tmp += complex(0, np.sum(np.array(k_m[k]) + np.array(G_m[g]))) * C[i][k][g] * np.exp(  complex( 0, np.inner( (np.array(k_m[k]) + np.array(G_m[g])), np.array(r) ) )  )  * \
+                            complex(0, np.sum(np.array(k_m[k_p]) + np.array(G_m[g]))) * C[i][k_p][g] * np.exp(  complex( 0, np.inner( (np.array(k_m[k_p]) + np.array(G_m[g])), np.array(r) ) )  )      
                 return tmp
-            K[i][k] = func
+            K[k][k_p] = func
 
     return K
 
