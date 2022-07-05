@@ -19,6 +19,7 @@ import Density
 # imp.reload(Basis)
 # imp.reload(Density)
 
+
 #################
 # k-point 설정
 #################
@@ -39,9 +40,12 @@ configs = {'i_max' : i_max, 'k_max' : len(k_m), 'G_max' : G_max, 'C' : C, 'k_m' 
 
 
 base = Basis.generate_plane_wave_basis(configs)
-K = Basis.get_K_matrix(configs)
+K = Basis.get_K_matrix(configs) # 적분하기 전임.. 적분해야함
 
-K[0][1](r = [0.1, 0.2, 0.1])
+print(K[0][1](r = [0.1, 0.2, 0.1]))
+
+
+F1 = Basis.get_F_integral_part_matrix(configs, r=[0.1, 0.1, 0,1])
 
 
 ############################
@@ -59,5 +63,6 @@ for i in range(nx):
 
 nik = Density.generate_nik_by_pw(configs)
 nr = Density.cal_Nr(configs, [0.5, 0.2, 0.7], nik)
+print(nr)
 
 
