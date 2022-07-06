@@ -6,6 +6,9 @@
     gernerate nodes
 """
 
+import numpy as np
+import random
+
 # 1. solve poisson equation, get hartree potential (veff)
     # - create node
 
