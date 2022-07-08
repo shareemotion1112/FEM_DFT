@@ -52,13 +52,20 @@ def generate_nik_by_pw(config, r = None):
     for i in range(i_max):
         for k in range(k_max):            
             tmp = ''
-            for g in range(G_max):                
-                for g_p in range(G_max):
-                    # print(C[i][k][g])
-                    tmp = tmp + " + " + f"{C[i][k][g]} * {C[i][k][g_p]} * \
-                            np.exp(complex(0, { k_m[k][0] + G_m[g][0] } * r[0] ) - complex(0, { k_m[k][0] + G_m[g_p][0] } * r[0] ) \
-                            + complex(0, { k_m[k][1] + G_m[g][1] } * r[1] ) - complex(0, { k_m[k][1] + G_m[g_p][1] } * r[1] ) \
-                            + complex(0, { k_m[k][2] + G_m[g][1] } * r[2] ) - complex(0, { k_m[k][2] + G_m[g_p][2] } * r[2] ))"
+            
+            if G_max > 1:
+                for g in range(G_max):                
+                    for g_p in range(G_max):
+                        if g != g_p:
+                            # print(C[i][k][g])
+                            tmp = tmp + " + " + f"{C[i][k][g]} * {C[i][k][g_p]} * \
+                                    np.exp(complex(0, { k_m[k][0] + G_m[g][0] } * r[0] ) - complex(0, { k_m[k][0] + G_m[g_p][0] } * r[0] ) \
+                                    + complex(0, { k_m[k][1] + G_m[g][1] } * r[1] ) - complex(0, { k_m[k][1] + G_m[g_p][1] } * r[1] ) \
+                                    + complex(0, { k_m[k][2] + G_m[g][1] } * r[2] ) - complex(0, { k_m[k][2] + G_m[g_p][2] } * r[2] ))"
+            else:
+                # 맞는지 확인 필요 (2022.07.08)
+                g = 0
+                tmp = tmp + " + " + f"{C[i][k][g]} * np.exp(complex(0, { k_m[k][0] + G_m[g][0] } * r[0] ) + complex(0, { k_m[k][1] + G_m[g][1] } * r[1] ) + complex(0, { k_m[k][2] + G_m[g][1] } * r[2] ) )"
             Psi[i][k] = tmp
     return Psi
 

@@ -23,7 +23,11 @@ nodes = np.zeros((nx, ny, nz))
     # create laplace operator, which is independent of basis functions 
     # create trial vector, we need the configuration of basis functions
 
+"""
 
+    WRONG_CODE
+
+"""
 
 
 # # only  5 diagonal component is non-zero for 2d

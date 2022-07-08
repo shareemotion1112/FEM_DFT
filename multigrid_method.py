@@ -51,11 +51,6 @@ import random
     [v111, v112, v113, v121, v122, v123, v131, v132, v133, v211, v212, v213, v221, v222, v223, v231, v232, v233, v311, v312, v313, v321, v322, v323, v331, v332, v333]
     [v111, v112, v113, v121, v122, v123, v131, v132, v133, v211, v212, v213, v221, v222, v223, v231, v232, v233, v311, v312, v313, v321, v322, v323, v331, v332, v333]
     [v111, v112, v113, v121, v122, v123, v131, v132, v133, v211, v212, v213, v221, v222, v223, v231, v232, v233, v311, v312, v313, v321, v322, v323, v331, v332, v333]
-    [v111, v112, v113, v121, v122, v123, v131, v132, v133, v211, v212, v213, v221, v222, v223, v231, v232, v233, v311, v312, v313, v321, v322, v323, v331, v332, v333]
-    [v111, v112, v113, v121, v122, v123, v131, v132, v133, v211, v212, v213, v221, v222, v223, v231, v232, v233, v311, v312, v313, v321, v322, v323, v331, v332, v333]
-    [v111, v112, v113, v121, v122, v123, v131, v132, v133, v211, v212, v213, v221, v222, v223, v231, v232, v233, v311, v312, v313, v321, v322, v323, v331, v332, v333]
-    [v111, v112, v113, v121, v122, v123, v131, v132, v133, v211, v212, v213, v221, v222, v223, v231, v232, v233, v311, v312, v313, v321, v322, v323, v331, v332, v333]
-    [v111, v112, v113, v121, v122, v123, v131, v132, v133, v211, v212, v213, v221, v222, v223, v231, v232, v233, v311, v312, v313, v321, v322, v323, v331, v332, v333]
     .
     .
     .
@@ -75,46 +70,80 @@ import random
 
 """
 
-N = 3
-a = []
-for i in range(N):
-    for j in range(N):
-        for k in range(N):
-            a.append(f"v{i}{j}{k}")
 
-x = np.array(a)
+def create_laplace_matrix(Nx, Ny, Nz, h = 1):
 
-A = np.zeros((N **3, N ** 3))
+    a = []
+    for i in range(Nx):
+        for j in range(Ny):
+            for k in range(Nz):
+                a.append(f"v{i}{j}{k}")
+    
+    x = np.array(a)
+    
+    A = np.zeros((Nx * Ny * Nx, Nx * Ny * Nx))
+    
+    np.fill_diagonal(A, 1)
 
-eqns = []
-for i in range(N):
-    for j in range(N):
-        for k in range(N):
-            if i >= 1 and j >= 1 and k >= 1 and i <= N -1 and j <= N-1 and k <= N-1:
-                eqns.append(f"-6 * v{i-1}{j}{k} + v{i-1}{j}{k} + v{i+1}{j}{k} + v{i}{j-1}{k}+ v{i}{j+1}{k} + v{i}{j}{k-1} + v{i}{j}{k+1} ")
+    eqns = []
+    for i in range(Nx):
+        for j in range(Ny):
+            for k in range(Nz):                
+                eqns.append(f"[-6 * v{i-1}{j}{k} + v{i-1}{j}{k} + v{i+1}{j}{k} + v{i}{j-1}{k}+ v{i}{j+1}{k} + v{i}{j}{k-1} + v{i}{j}{k+1} ] / h **2")
                 
                 row_ind = np.where( x == f"v{i}{j}{k}")
-                A[row_ind, row_ind] = -6
 
-                ind = np.where( x == f"v{i-1}{j}{k}")
-                A[row_ind, ind] = 1
+                if i >= 1 and j >= 1 and k >= 1 and i < (Nx-1) and j < (Ny-1) and k < (Nz-1):
+                    A[row_ind, row_ind] = -6 * h ** 2
+                
+                    ind = np.where( x == f"v{i-1}{j}{k}")
+                    A[row_ind, ind] = 1
+                
+                    ind = np.where( x == f"v{i+1}{j}{k}")
+                    A[row_ind, ind] = 1
+                
+                    ind = np.where( x == f"v{i}{j-1}{k}")
+                    A[row_ind, ind] = 1
 
-                ind = np.where( x == f"v{i+1}{j}{k}")
-                A[row_ind, ind] = 1
+                    ind = np.where( x == f"v{i}{j+1}{k}")
+                    A[row_ind, ind] = 1
 
-                ind = np.where( x == f"v{i}{j-1}{k}")
-                A[row_ind, ind] = 1
+                    ind = np.where( x == f"v{i}{j}{k-1}")
+                    A[row_ind, ind] = 1
 
-                ind = np.where( x == f"v{i}{j+1}{k}")
-                A[row_ind, ind] = 1
+                    ind = np.where( x == f"v{i}{j}{k+1}")
+                    A[row_ind, ind] = 1
 
-                ind = np.where( x == f"v{i}{j}{k-1}")
-                A[row_ind, ind] = 1
+                # 경계에서 디리클레 바운더리 적용 Vb − Vi / h = f'
+                #  출처 : 17번식  in   https://my.ece.utah.edu/~ece6340/LECTURES/Feb1/Nagel%202012%20-%20Solving%20the%20Generalized%20Poisson%20Equation%20using%20FDM.pdf 
+                if i == 0 :                    
+                    if i+1 < Nx:
+                        ind = np.where( x == f"v{i+1}{j}{k}")
+                        A[row_ind, ind] = -1
+                if i == Nx - 1 :
+                    if i - 1 >= 0:                    
+                        ind = np.where( x == f"v{i-1}{j}{k}")
+                        A[row_ind, ind] = -1
+                
+                if j == 0 :                    
+                    if j+1 < Ny:
+                        ind = np.where( x == f"v{i}{j+1}{k}")
+                        A[row_ind, ind] = -1
+                if j == Ny - 1 :
+                    if j - 1 >= 0:                    
+                        ind = np.where( x == f"v{i}{j-1}{k}")
+                        A[row_ind, ind] = -1
 
-                ind = np.where( x == f"v{i}{j}{k+1}")
-                A[row_ind, ind] = 1
 
-
+                if k == 0 :                    
+                    if k+1 < Nz:
+                        ind = np.where( x == f"v{i}{j}{k+1}")
+                        A[row_ind, ind] = -1
+                if k == Nz - 1 :
+                    if k - 1 >= 0:                    
+                        ind = np.where( x == f"v{i}{j}{k-1}")
+                        A[row_ind, ind] = -1
+    return A, x
 
 
 
