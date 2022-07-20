@@ -4,6 +4,7 @@
 
 
 import enum
+from matplotlib import projections
 import numpy as np
 import random
 import os
@@ -76,7 +77,38 @@ for i, ind in enumerate(ind_vector):
 HF_potential = np.inner(np.linalg.inv(A), -1 * f) 
 
 # HF potential 계산한거 검증 필요 2022.07.08
+HF_potential.shape
+ind_vector.shape
+    
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt    
+from matplotlib import cm
 
-    
-    
-    
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+size = ind_vector.shape[0]
+
+x = np.zeros(size)
+y = np.zeros(size)
+z = np.zeros(size)
+c = np.zeros(size)
+
+for i, ind in enumerate(ind_vector):
+    x[i] = int(ind[1])
+    y[i] = int(ind[2])
+    z[i] = int(ind[3])
+    c[i] = HF_potential[i]
+
+
+c_norm = (c - np.min(c)) / (np.max(c) - np.min(c))
+c_norm = [round(c, 2) for c in c_norm]
+mask = c_norm > 0.1
+
+img  = ax.scatter(x, y, z, c = c_norm, s = 20)
+plt.tight_layout()
+fig.colorbar(img)
+plt.show()
+
+ 
