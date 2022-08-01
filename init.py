@@ -4,7 +4,6 @@
 
 
 import enum
-from matplotlib import projections
 import numpy as np
 import random
 import os
@@ -14,42 +13,44 @@ os.getcwd()
 import imp
 import Basis
 import Density
-import backup.Hatree_Potential_FDM as Hatree_Potential_FDM
+# import backup.Hatree_Potential_FDM as Hatree_Potential_FDM
 import multigrid_method
 
-# 2. from the veff, we can get full potential
-# 3. then calculate the coefficient of electron density functions.
-
-# imp.reload(Basis)
-# imp.reload(Density)
-# imp.reload(multigrid_method)
+def re_import_lib():
+	imp.reload(Basis)
+	imp.reload(Density)
+	imp.reload(multigrid_method)
 
 #################
 # k-point 설정
+# C, K등에 임의의 상수 배정 
 #################
 i_max = G_max = 1
 kx = ky = kz = 9
 size_of_mesh = 10 # 나중에 메인 설정에서 받아와야 함
+Div = 100
+
 
 k_m = [None for i in range(kx * ky * kz)]
 
 for i in range(len(k_m)):
-    k_m[i] = [np.random.random() * size_of_mesh, np.random.random() * size_of_mesh, np.random.random() * size_of_mesh]
+    k_m[i] = [np.random.random() * size_of_mesh, np.random.random() * size_of_mesh, np.random.random() * size_of_mesh / Div ] 
 
 G_m = [[0, 0, 0]]
 
 k_max = len(k_m)
-C = np.random.random((i_max, k_max, G_max))
+C = np.random.random((i_max, k_max, G_max)) / Div
 configs = {'i_max' : i_max, 'k_max' : len(k_m), 'G_max' : G_max, 'C' : C, 'k_m' : k_m, 'G_m' : G_m}
 
-
-base = Basis.generate_plane_wave_basis(configs)
+# base = Basis.generate_plane_wave_basis(configs)
 # K = Hatree_Potential_FDM.get_K_matrix(configs) # 적분하기 전임.. 적분해야함
 # F1 = Hatree_Potential_FDM.get_F_integral_part_matrix(configs, r=[0.1, 0.1, 0,1])
 
 
 ############################
 # 각 node의 인덱스 생성
+# n_{ik} 계산
+# laplace operator 생성
 ############################
 nx = ny = nz = 6; h = 1
 flattened_index_of_nodes = [None for i in range(nx * ny * nz)]
@@ -60,9 +61,12 @@ for i in range(nx):
             flattened_index_of_nodes[q] = (i, j, k)
             q += 1
 
-
 nik = Density.generate_nik_by_pw(configs)
-nr = Density.cal_Nr(configs, [0.5, 0.2, 0.7], nik)
+# nr = Density.cal_Nr(configs, [0.5, 0.2, 0.7], nik)
+
+
+# 경계 조건을 어딘가에 넣어야 할 것 같은데?? ----------------------------- 2022.08.01
+
 
 A, ind_vector = multigrid_method.create_laplace_matrix(nx, ny, nz)
 
@@ -76,14 +80,12 @@ for i, ind in enumerate(ind_vector):
 
 HF_potential = np.inner(np.linalg.inv(A), -1 * f) 
 
-# HF potential 계산한거 검증 필요 2022.07.08
-HF_potential.shape
-ind_vector.shape
+# HF potential 계산한거 검증 필요 ----------------------------------  2022.07.08
+print(f"HF_potential.shape : {HF_potential.shape}, ind_vector.shape : {ind_vector.shape}")
     
-from mpl_toolkits.mplot3d import Axes3D
+# from mpl_toolkits.mplot3d import Axes3D
+# from matplotlib import cm
 import matplotlib.pyplot as plt    
-from matplotlib import cm
-
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
@@ -112,3 +114,9 @@ fig.colorbar(img)
 plt.show()
 
  
+
+
+
+# 2. from the veff, we can get full potential
+# 3. then calculate the coefficient of electron density functions.
+
