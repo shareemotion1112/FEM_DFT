@@ -134,7 +134,6 @@ def create_laplace_matrix(Nx, Ny, Nz, h = 1):
                         ind = np.where( x == f"v{i}{j-1}{k}")
                         A[row_ind, ind] = -1
 
-
                 if k == 0 :                    
                     if k+1 < Nz:
                         ind = np.where( x == f"v{i}{j}{k+1}")
